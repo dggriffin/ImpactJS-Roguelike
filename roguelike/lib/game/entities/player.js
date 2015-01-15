@@ -6,7 +6,7 @@ ig.module('game.entities.player')
 
         size: { x: 16, y: 16 },
         speed: 100,
-        animSheet: new ig.AnimationSheet('media/tilesheet.png', 16, 16),
+        animSheet: new ig.AnimationSheet('media/Player0.png', 16, 16),
 
         moveIntention: null,
         lastMove: null,
@@ -16,7 +16,7 @@ ig.module('game.entities.player')
             this.parent(x, y, settings);
 
             // Give the player the appearance that he has.
-            this.addAnim('default', 1, [0]);
+            this.addAnim('default', 1, [1]);
 
             // Set speed as the max velocity.
             this.maxVel.x = this.maxVel.y = this.speed;
