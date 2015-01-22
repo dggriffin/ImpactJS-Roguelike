@@ -1,5 +1,4 @@
 ## Summary ##
-This is an ImpactJS example of how to achieve Pokemon game style movement between tiles.
-
+This is an ImpactJS example of how to build a grid/tile-based rogue-like, with random dungeon generation.
 ## Demo ##
-http://www.commins.ca/impact-grid-movement/
+http://grifflr.com/roguelike/
