@@ -1,5 +1,5 @@
 ## Summary ##
-This is an ImpactJS implementation of a roguelike with tile-based movement, and procedurally generated levels.
+This is an ImpactJS example of how to achieve Pokemon game style movement between tiles.
 
 ## Demo ##
-http://grifflr.com/roguelike/
+http://www.commins.ca/impact-grid-movement/

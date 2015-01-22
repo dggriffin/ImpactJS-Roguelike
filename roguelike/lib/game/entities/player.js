@@ -4,9 +4,9 @@ ig.module('game.entities.player')
 
     EntityPlayer = ig.Entity.extend({
 
-        size: { x: 16, y: 16 },
+        size: { x: 24, y: 24 },
         speed: 100,
-        animSheet: new ig.AnimationSheet('media/Player0.png', 16, 16),
+        animSheet: new ig.AnimationSheet('media/playertestsheet.png', 24, 24),
 
         moveIntention: null,
         lastMove: null,
@@ -16,7 +16,9 @@ ig.module('game.entities.player')
             this.parent(x, y, settings);
 
             // Give the player the appearance that he has.
-            this.addAnim('default', 1, [1]);
+            //this.addAnim('default', 1, [0]);
+            this.addAnim( 'idle', .5, [0,1] );
+            this.addAnim( 'step', 1, [1, 2, 1] );
 
             // Set speed as the max velocity.
             this.maxVel.x = this.maxVel.y = this.speed;
@@ -41,11 +43,13 @@ ig.module('game.entities.player')
             // Stop the moving entity if at the destination.
             if(this.isMoving() && this.justReachedDestination() && !this.moveIntention) {
                 this.stopMoving();
+                this.currentAnim = this.anims.idle;
             }
             // Stop the moving entity when it hits a wall.
             else if(this.isMoving() && this.justReachedDestination() && this.moveIntention &&
                     !this.canMoveDirectionFromTile(this.destination.x, this.destination.y, this.moveIntention)) {
                 this.stopMoving();
+                this.currentAnim = this.anims.idle;
             }
             // Destination reached, but set new destination and keep going.
             else if(this.isMoving() && this.justReachedDestination() && this.moveIntention &&
@@ -62,11 +66,13 @@ ig.module('game.entities.player')
             // Destination not yet reached, so keep going.
             else if(this.isMoving() && !this.justReachedDestination()) {
                 this.continueMovingToDestination();
+                
             }
             // Not moving, but wanting to, so start!
             else if(!this.isMoving() && this.moveIntention &&
                     this.canMoveDirectionFromCurrentTile(this.moveIntention)) {
                 this.startMoving(this.moveIntention);
+
             }
 
         },
@@ -81,8 +87,15 @@ ig.module('game.entities.player')
         getTileAdjacentToTile: function(tileX, tileY, direction) {
             if(direction === moveType.UP) tileY += -1;
             else if(direction === moveType.DOWN) tileY += 1;
-            else if(direction === moveType.LEFT) tileX += -1;
-            else if(direction === moveType.RIGHT) tileX += 1;
+            else if(direction === moveType.LEFT){
+                tileX += -1;
+                this.currentAnim.flip.x = false;
+
+            }
+            else if(direction === moveType.RIGHT){
+                tileX += 1;
+                this.currentAnim.flip.x = true;
+            }
             return { x: tileX, y: tileY };
         },
 
