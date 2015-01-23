@@ -8,11 +8,16 @@ ig.module('game.classes.room')
             westExit: null,
             southExit: null,
             eastExit: null,
+            northRoom: null,
+            westRoom: null,
+            southRoom: null,
+            eastRoom: null,
             tileArray: null,
-            wallTiles : [],
+            exitCount: 0,
+            wallTiles: [],
             groundTiles: [],
             height: 0,
-            weidth: 0,
+            width: 0,
             init: function (tileArray) {
                 this.tileArray = tileArray;
             },
@@ -34,7 +39,54 @@ ig.module('game.classes.room')
             },
             getEastExit: function () {
                 return this.eastExit;
+            },
+            getNorthRoom: function () {
+                return this.northRoom;
+            },
+            getWestRoom: function () {
+                return this.westRoom;
+            },
+            getSouthRoom: function () {
+                return this.southRoom;
+            },
+            getEastRoom: function () {
+                return this.eastRoom;
+            },
+            getExitCount: function () {
+                this.exitCount = 0;
+                if (this.westExit !== null) {
+                    this.exitCount = this.exitCount + 1;
+                }
+                if (this.nortExit !== null) {
+                    this.exitCount = this.exitCount + 1;
+                }
+                if (this.eastExit !== null) {
+                    this.exitCount = this.exitCount + 1;
+                }
+                if (this.southExit !== null) {
+                    this.exitCount = this.exitCount + 1;
+                }
+                return this.exitCount;
+
+            },
+            getOpenExits: function () {
+                var openExits = 0;
+                if (this.westExit !== null && this.westRoom === null) {
+                    openExits = openExits + 1;
+                }
+                if (this.nortExit !== null && this.northRoom === null) {
+                    openExits = openExits + 1;
+                }
+                if (this.eastExit !== null && this.eastRoom === null) {
+                    openExits = openExits + 1;
+                }
+                if (this.southExit !== null && this.southRoom === null) {
+                   openExits = openExits + 1;
+                }
+
+                return openExits;
             }
+
 
 
         });

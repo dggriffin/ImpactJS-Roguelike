@@ -1,7 +1,7 @@
-ig.module( 'game.levels.corridor1' )
+ig.module( 'game.levels.corridor3' )
 .requires( 'impact.image','game.entities.player' )
 .defines(function(){
-LevelCorridor1=/*JSON[*/{
+LevelCorridor3=/*JSON[*/{
 	"entities": [
 		{
 			"type": "EntityPlayer",
@@ -144,5 +144,5 @@ LevelCorridor1=/*JSON[*/{
 		}
 	]
 }/*]JSON*/;
-LevelCorridor1Resources=[new ig.Image('media/canvas2_oryx_16bit_fantasy_world.png'), new ig.Image('media/Wall.png')];
+LevelCorridor3Resources=[new ig.Image('media/canvas2_oryx_16bit_fantasy_world.png'), new ig.Image('media/Wall.png')];
 });
