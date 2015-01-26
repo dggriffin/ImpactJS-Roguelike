@@ -5,6 +5,8 @@ ig.module(
         'plugins.camera',
         'plugins.parallel',
         'game.entities.player',
+        'game.entities.door',
+        'game.entities.skeleton',
         'impact.game',
         'impact.font',
         'game.levels.demo',
@@ -23,8 +25,18 @@ ig.module(
 
             levelAssets: new LevelAssets(),
 
+            turnScheduler: new ROT.Scheduler.Simple(),
+            actorCount: 0,
+            currentTurn: null,
+
             init: function () {
 
+                this.turnScheduler.add(this.actorCount += 1, true); /* true = recurring actor */
+
+
+                this.currentTurn = this.turnScheduler.next();
+
+                /* simulate several turns */
                 // Bind keys.
                 ig.input.bind(ig.KEY.UP_ARROW, 'up');
                 ig.input.bind(ig.KEY.DOWN_ARROW, 'down');
@@ -35,6 +47,8 @@ ig.module(
                 ig.input.bind(ig.KEY.A, 'left');
                 ig.input.bind(ig.KEY.D, 'right');
 
+
+
                 // Load demo level.
 
                 //this.fog = new ig.Fog(2, 2, 24);
@@ -42,6 +56,12 @@ ig.module(
                 var dungeon = this.generateDungeon2();
                 this.loadLevel(dungeon);
             },
+
+            entitySet: [{
+                "type": "EntityPlayer",
+                "x": 2232,
+                "y": 2232
+  }],
 
             draw: function () {
 
@@ -52,25 +72,23 @@ ig.module(
                 var y = ig.system.height - this.font.height - 2;
                 this.font.draw('Use the ARROW KEYS to move around.', x, y, ig.Font.ALIGN.CENTER);
 
-             //   this.fog.draw(this.viewedTile.bind(this));
+                //   this.fog.draw(this.viewedTile.bind(this));
             },
 
             viewedTile: function (x, y) {
 
                 var currentX = ig.game.player.getCurrentTile().x;
                 var currentY = ig.game.player.getCurrentTile().y;
-                
-                if(Math.abs(x - currentX) === 5)
-                {
-                     return true;
-                }
-                
-                 if(Math.abs(y - currentY) === 5)
-                {
-                     return true;
+
+                if (Math.abs(x - currentX) === 5) {
+                    return true;
                 }
 
-               
+                if (Math.abs(y - currentY) === 5) {
+                    return true;
+                }
+
+
             },
 
             loadLevel: function (data) {
@@ -114,8 +132,8 @@ ig.module(
 
                 //                 Instead of using the camera plugin, we could also just center
                 //                 the screen on the player directly, like this:
-                this.screen.x = this.player.pos.x - ig.system.width / 2;
-                this.screen.y = this.player.pos.y - ig.system.height / 2;
+                                this.screen.x = this.player.pos.x - ig.system.width / 2;
+                                this.screen.y = this.player.pos.y - ig.system.height / 2;
 
             },
 
@@ -123,7 +141,8 @@ ig.module(
             generateRecursive: function (currentRoom, cursorX, cursorY, count) {
                 console.log(count);
                 console.log(' x: ' + cursorX + ' y: ' + cursorY);
-                if (count > 0) {
+                var blankDungeon = this.levelAssets.blankDungeon;
+                if (count > 0 && cursorX - 7 > 0 && cursorY - 7 > 0 && cursorX + 7 < blankDungeon.length && cursorY + 7 < blankDungeon.length) {
                     count = count - 1;
 
                     var currentRoomTileArray = currentRoom.getTileArray();
@@ -151,6 +170,12 @@ ig.module(
                         };
                         cursor.x += currentRoom.westExit.x;
                         cursor.y += currentRoom.westExit.y;
+                        this.entitySet.push({
+                            "type": "EntityDoor",
+                            "x": cursor.x * 24,
+                            "y": cursor.y * 24
+                        });
+
                         cursor.x -= Math.floor(currentRoom.width / 2);
                         if (this.levelAssets.blankDungeon[cursor.y][cursor.x] === 0) {
 
@@ -180,8 +205,23 @@ ig.module(
                         };
                         cursor.x += currentRoom.northExit.x;
                         cursor.y += currentRoom.northExit.y;
+                        this.entitySet.push({
+                            "type": "EntityDoor",
+                            "x": cursor.x * 24,
+                            "y": cursor.y * 24
+                        });
                         cursor.y -= Math.floor(currentRoom.height / 2);
                         if (this.levelAssets.blankDungeon[cursor.y][cursor.x] === 0) {
+
+                            this.turnScheduler.add(this.actorCount += 1, true);
+
+                            this.entitySet.push({
+                                "type": "EntitySkeleton",
+                                "x": cursor.x * 24,
+                                "y": cursor.y * 24,
+                                settings : { turnNumber : this.actorCount}
+                            });
+
 
                             var room = null;
                             var matchedEntrance = null;
@@ -209,6 +249,11 @@ ig.module(
                         };
                         cursor.x += currentRoom.eastExit.x;
                         cursor.y += currentRoom.eastExit.y;
+                        this.entitySet.push({
+                            "type": "EntityDoor",
+                            "x": cursor.x * 24,
+                            "y": cursor.y * 24
+                        });
                         cursor.x += Math.floor(currentRoom.width / 2);
                         if (this.levelAssets.blankDungeon[cursor.y][cursor.x] === 0) {
 
@@ -240,6 +285,11 @@ ig.module(
                         };
                         cursor.x += currentRoom.southExit.x;
                         cursor.y += currentRoom.southExit.y;
+                        this.entitySet.push({
+                            "type": "EntityDoor",
+                            "x": cursor.x * 24,
+                            "y": cursor.y * 24
+                        });
                         cursor.y += Math.floor(currentRoom.height / 2);
                         if (this.levelAssets.blankDungeon[cursor.y][cursor.x] === 0) {
 
@@ -254,7 +304,7 @@ ig.module(
                                 room = this.levelAssets.getRandomRoom();
                                 matchedEntrance = room.getNorthExit();
                             }
-                            cursor.x = cursor.y + room.height - 1;
+                            cursor.y = cursor.y + room.height - 1;
                             this.generateRecursive(room, cursor.x, cursor.y, count);
                         }
 
@@ -278,19 +328,16 @@ ig.module(
                 }
                 var room = this.levelAssets.getRandomRoom();
 
-                this.generateRecursive(room, cursor.x, cursor.y, 8);
+                this.generateRecursive(room, cursor.x, cursor.y, 99);
 
 
 
 
                 return {
-                    "entities": [
-                        {
-                            "type": "EntityPlayer",
-                            "x": 2232,
-                            "y": 2232
-  }
- ],
+
+                    "entities": this.entitySet,
+
+
                     "layer": [
                         {
                             "name": "ground",
@@ -329,6 +376,7 @@ ig.module(
 
         });
 
-        ig.main('#canvas', MyGame, 60, 290, 240, 3.5);
+         ig.main('#canvas', MyGame, 60, 290, 240, 3.5);
+       // ig.main('#canvas', MyGame, 60, 1200, 1200, 3);
 
     });
